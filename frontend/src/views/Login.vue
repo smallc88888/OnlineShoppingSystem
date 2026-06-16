@@ -37,6 +37,8 @@ const handleLogin = async () => {
     const res = await authApi.login(loginForm.value)
     if (res.data.code === 200) {
       alert('登录成功！欢迎: ' + res.data.data.username)
+      // 将真实的用户 ID 存入浏览器本地（请根据你后端实际返回的字段名调整 data.data.id）
+      localStorage.setItem('userId', res.data.data.id.toString())
       router.push('/products')
     }
   } catch (error: any) {

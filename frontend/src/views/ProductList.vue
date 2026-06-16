@@ -5,6 +5,7 @@
       <div class="nav-links">
         <router-link to="/login">登录</router-link>
         <router-link to="/register">注册账号</router-link>
+        <a href="#" @click.prevent="handleLogout">退出登录</a>
       </div>
     </div>
 
@@ -42,12 +43,20 @@
       <button :disabled="currentPage === pageData.totalPages" @click="changePage(currentPage + 1)">下一页</button>
     </div>
   </div>
+
+  <div class="container">
+    <button class="floating-cart" @click="router.push('/cart')">
+      🛒 购物车
+      <span v-if="globalCartCount > 0" class="badge">{{ globalCartCount }}</span>
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { productApi, PageResult, Product } from '../api/product'
+import { cartApi, globalCartCount } from '../api/cart'
 const router = useRouter()
 
 const goToDetail = (id: number) => {
@@ -110,7 +119,18 @@ const changePage = (newPage: number) => {
 // 页面一加载，自动请求第一页数据
 onMounted(() => {
   loadProducts()
+  cartApi.getCart()
 })
+
+const handleLogout = () => {
+  // 清除本地存储的身份凭证
+  localStorage.removeItem('userId')
+  // 清空全局购物车徽章
+  globalCartCount.value = 0
+  // 提示并跳回登录页
+  alert('已安全退出')
+  router.push('/login')
+}
 </script>
 
 <style scoped>
@@ -140,4 +160,31 @@ onMounted(() => {
 .pagination { display: flex; justify-content: center; align-items: center; margin-top: 30px; gap: 15px; }
 .pagination button { padding: 5px 15px; cursor: pointer; }
 .pagination button:disabled { cursor: not-allowed; opacity: 0.5; }
+
+.floating-cart {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  background-color: #e4393c;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 15px 25px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(228, 57, 60, 0.4);
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.floating-cart:hover { transform: scale(1.05); }
+.badge {
+  background-color: white;
+  color: #e4393c;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
 </style>

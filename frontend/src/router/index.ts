@@ -4,6 +4,7 @@ const Login = () => import('../views/Login.vue')
 const Register = () => import('../views/Register.vue')
 const ProductList = () => import('../views/ProductList.vue')
 const ProductDetail = () => import('../views/ProductDetail.vue')
+const Cart = () => import('../views/Cart.vue')
 
 const router = createRouter({
     history: createWebHistory(),
@@ -12,7 +13,8 @@ const router = createRouter({
         { path: '/login', component: Login },
         { path: '/register', component: Register },
         { path: '/products', component: ProductList},
-        { path: '/product/:id', component: ProductDetail}
+        { path: '/product/:id', component: ProductDetail},
+        { path: '/cart', component: Cart }
     ]
 })
 

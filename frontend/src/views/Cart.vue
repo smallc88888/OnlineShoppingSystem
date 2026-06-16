@@ -47,7 +47,9 @@
         <div class="total-price">
           总金额：<span>¥{{ totalPrice.toFixed(2) }}</span>
         </div>
-        <button class="checkout-btn">去结算</button>
+        <button class="checkout-btn" @click="handleCheckout" :disabled="cartItems.length === 0">
+          去结算
+        </button>
       </div>
     </div>
   </div>
@@ -130,6 +132,14 @@ const removeItem = async (id: number) => {
 onMounted(() => {
   loadCart()
 })
+
+const handleCheckout = () => {
+  if (cartItems.value.length === 0) {
+    alert('购物车中没有商品，无法结算')
+    return
+  }
+  router.push('/checkout')
+}
 </script>
 
 <style scoped>

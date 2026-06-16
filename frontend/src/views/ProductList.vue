@@ -3,9 +3,20 @@
     <div class="top-nav">
       <h2>商品浏览中心</h2>
       <div class="nav-links">
-        <router-link to="/login">登录</router-link>
-        <router-link to="/register">注册账号</router-link>
-        <a href="#" @click.prevent="handleLogout">退出登录</a>
+
+        <template v-if="!isLoggedIn">
+          <router-link to="/login">登录</router-link>
+          <router-link to="/register">注册账号</router-link>
+        </template>
+
+        <template v-else>
+          <router-link to="/cart" class="cart-badge">
+            购物车 ({{ globalCartCount }})
+          </router-link>
+          <router-link to="/orders">我的订单</router-link>
+          <a href="#" @click.prevent="handleLogout">退出登录</a>
+        </template>
+
       </div>
     </div>
 
@@ -58,6 +69,9 @@ import { ref, onMounted } from 'vue'
 import { productApi, PageResult, Product } from '../api/product'
 import { cartApi, globalCartCount } from '../api/cart'
 const router = useRouter()
+
+// 定义响应式的登录状态变量，初始值设为 false
+const isLoggedIn = ref(false)
 
 const goToDetail = (id: number) => {
   router.push(`/product/${id}`)
@@ -118,8 +132,12 @@ const changePage = (newPage: number) => {
 
 // 页面一加载，自动请求第一页数据
 onMounted(() => {
+  // 页面每次挂载时，实时去 localStorage 查验一次真实状态
+  isLoggedIn.value = !!localStorage.getItem('userId')
   loadProducts()
-  cartApi.getCart()
+  if (isLoggedIn.value) {
+    cartApi.getCart()
+  }
 })
 
 const handleLogout = () => {
@@ -127,6 +145,8 @@ const handleLogout = () => {
   localStorage.removeItem('userId')
   // 清空全局购物车徽章
   globalCartCount.value = 0
+  // 退出时同步重置状态
+  isLoggedIn.value = false
   // 提示并跳回登录页
   alert('已安全退出')
   router.push('/login')

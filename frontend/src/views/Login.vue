@@ -37,7 +37,7 @@ const handleLogin = async () => {
     const res = await authApi.login(loginForm.value)
     if (res.data.code === 200) {
       alert('登录成功！欢迎: ' + res.data.data.username)
-      // TODO: 登录成功后的逻辑（比如存 Token、跳转到商品首页等，后续再做）
+      router.push('/products')
     }
   } catch (error: any) {
     // 捕获后端的 400 或 403 错误（账号锁定等）

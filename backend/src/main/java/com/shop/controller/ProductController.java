@@ -49,4 +49,30 @@ public class ProductController {
             em.close();
         }
     }
+
+    /**
+     * 商品详情接口
+     * GET /api/products/{id}
+     */
+    @GET
+    @Path("/{id}")
+    public Response getProductDetail(@PathParam("id") Long id) {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            ProductDao productDao = new ProductDao(em);
+            ProductService productService = new ProductService(productDao);
+
+            Product product = productService.getProductById(id);
+
+            ApiResponse<Product> response = new ApiResponse<>(200, "获取商品详情成功", product);
+            return Response.ok(response).build();
+
+        } catch (IllegalArgumentException e) {
+            // 捕获“商品不存在或已下架”异常 (404 Not Found 更符合语义)
+            ApiResponse<Void> response = new ApiResponse<>(404, e.getMessage(), null);
+            return Response.status(Response.Status.NOT_FOUND).entity(response).build();
+        } finally {
+            em.close();
+        }
+    }
 }

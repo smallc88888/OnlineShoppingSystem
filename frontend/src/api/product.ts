@@ -44,5 +44,10 @@ export const productApi = {
                 pageSize
             }
         })
+    },
+
+    // 获取商品详情
+    getProductById(id: number | string) {
+        return apiClient.get<ApiResponse<Product>>(`/products/${id}`)
     }
 }

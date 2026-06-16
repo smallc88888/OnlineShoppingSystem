@@ -1,6 +1,12 @@
 <template>
   <div class="container">
-    <h2>商品浏览中心</h2>
+    <div class="top-nav">
+      <h2>商品浏览中心</h2>
+      <div class="nav-links">
+        <router-link to="/login">登录</router-link>
+        <router-link to="/register">注册账号</router-link>
+      </div>
+    </div>
 
     <div class="search-box">
       <input
@@ -16,7 +22,7 @@
     <div v-if="errorMessage" class="error-msg">{{ errorMessage }}</div>
 
     <div class="product-grid" v-if="pageData.items.length > 0">
-      <div class="product-card" v-for="item in pageData.items" :key="item.id">
+      <div class="product-card" v-for="item in pageData.items" :key="item.id" @click="goToDetail(item.id)">
         <h3>{{ item.name }}</h3>
         <p class="desc">{{ item.description }}</p>
         <div class="price-stock">
@@ -39,8 +45,14 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { productApi, PageResult, Product } from '../api/product'
+const router = useRouter()
+
+const goToDetail = (id: number) => {
+  router.push(`/product/${id}`)
+}
 
 // 响应式状态管理
 const searchKeyword = ref('')
@@ -102,6 +114,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.top-nav { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; margin-bottom: 20px; padding-bottom: 10px; }
+.top-nav h2 { margin: 0; }
+.nav-links a { margin-left: 15px; text-decoration: none; color: #007bff; }
+.nav-links a:hover { text-decoration: underline; }
+
 .container { max-width: 800px; margin: 30px auto; font-family: sans-serif; }
 .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
 .search-box input { flex: 1; padding: 8px; }
@@ -113,7 +130,7 @@ onMounted(() => {
 
 /* 原生极简网格布局 */
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
-.product-card { border: 1px solid #ddd; border-radius: 4px; padding: 15px; background: #fafafa; }
+.product-card { border: 1px solid #ddd; border-radius: 4px; padding: 15px; background: #fafafa; cursor: pointer; }
 .product-card h3 { margin: 0 0 10px 0; font-size: 18px; color: #333; }
 .desc { color: #666; font-size: 14px; height: 40px; overflow: hidden; }
 .price-stock { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }

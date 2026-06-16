@@ -70,4 +70,14 @@ public class ProductDao {
 
         return query.getSingleResult();
     }
+
+    /**
+     * 根据商品 ID 精准查找
+     * @param id 商品主键
+     * @return Product 实体，如果不存在则返回 null
+     */
+    public Product findById(Long id) {
+        // 使用 JPA 原生的 find 方法，通过主键直接去缓存或数据库抓取，性能极高
+        return em.find(Product.class, id);
+    }
 }

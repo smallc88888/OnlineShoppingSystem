@@ -48,4 +48,23 @@ public class ProductService {
         // 5. 组装结果
         return new PageResultDTO<>(total, totalPages, page, pageSize, products);
     }
+
+    /**
+     * 获取商品详情
+     */
+    public Product getProductById(Long id) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("无效的商品 ID");
+        }
+
+        Product product = productDao.findById(id);
+
+        // 业务规则：商品必须存在，且必须处于上架状态
+        if (product == null || !product.isActive()) {
+            // 模糊化报错，不暴露数据库到底有没有这条数据
+            throw new IllegalArgumentException("商品不存在或已下架");
+        }
+
+        return product;
+    }
 }

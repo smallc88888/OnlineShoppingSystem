@@ -53,12 +53,13 @@
       <span class="page-info">第 {{ currentPage }} / {{ pageData.totalPages }} 页 (共 {{ pageData.total }} 件)</span>
       <button :disabled="currentPage === pageData.totalPages" @click="changePage(currentPage + 1)">下一页</button>
     </div>
-  </div>
 
-  <div class="container">
     <button class="floating-cart" @click="router.push('/cart')">
       🛒 购物车
       <span v-if="globalCartCount > 0" class="badge">{{ globalCartCount }}</span>
+    </button>
+    <button v-if="isAdmin" class="admin-entrance-btn" @click="router.push('/admin/products')">
+      ⚙️ 进入后台
     </button>
   </div>
 </template>
@@ -130,10 +131,13 @@ const changePage = (newPage: number) => {
   loadProducts()
 }
 
+const isAdmin = ref(false)
+
 // 页面一加载，自动请求第一页数据
 onMounted(() => {
   // 页面每次挂载时，实时去 localStorage 查验一次真实状态
   isLoggedIn.value = !!localStorage.getItem('userId')
+  isAdmin.value = localStorage.getItem('userRole') === '1'
   loadProducts()
   if (isLoggedIn.value) {
     cartApi.getCart()
@@ -143,13 +147,17 @@ onMounted(() => {
 const handleLogout = () => {
   // 清除本地存储的身份凭证
   localStorage.removeItem('userId')
+  // 清理权限标识
+  localStorage.removeItem('userRole')
   // 清空全局购物车徽章
   globalCartCount.value = 0
   // 退出时同步重置状态
   isLoggedIn.value = false
+  // 退出时同步重置管理员状态
+  isAdmin.value = false
   // 提示并跳回登录页
   alert('已安全退出')
-  router.push('/login')
+  router.push('/')
 }
 </script>
 
@@ -206,5 +214,26 @@ const handleLogout = () => {
   padding: 2px 6px;
   font-size: 12px;
   font-weight: bold;
+}
+
+/* 追加管理员入口悬浮按钮样式 */
+.admin-entrance-btn {
+  position: fixed;
+  bottom: 40px;
+  left: 40px;
+  background-color: #343a40;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 15px 25px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(52, 58, 64, 0.4);
+  transition: transform 0.2s;
+  z-index: 1000;
+}
+.admin-entrance-btn:hover {
+  transform: scale(1.05);
+  background-color: #23272b;
 }
 </style>

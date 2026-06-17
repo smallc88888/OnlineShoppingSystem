@@ -39,6 +39,9 @@ const handleLogin = async () => {
       alert('登录成功！欢迎: ' + res.data.data.username)
       // 将真实的用户 ID 存入浏览器本地（请根据你后端实际返回的字段名调整 data.data.id）
       localStorage.setItem('userId', res.data.data.id.toString())
+      // 将角色标识存入本地（ 1 为管理员，0 为普通用户）
+      // 如果后端没传 role，前端可能会存个 undefined，这会是个隐患，请确保后端登录接口返回了 role
+      localStorage.setItem('userRole', res.data.data.role.toString())
       router.push('/products')
     }
   } catch (error: any) {

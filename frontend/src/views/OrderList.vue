@@ -30,9 +30,17 @@
               {{ getStatusText(order.status) }}
             </span>
           </div>
-          <button class="toggle-btn" @click="toggleDetail(order.orderNo)">
-            {{ expandedOrder === order.orderNo ? '收起详情 ▲' : '查看详情 ▼' }}
-          </button>
+          <div class="action-group">
+            <button class="action-btn pay-btn" v-if="order.status === 1" @click="handlePay(order.id)">
+              💳 付款
+            </button>
+            <button class="action-btn receive-btn" v-if="order.status === 3" @click="handleReceive(order.id)">
+              📦 确认收货
+            </button>
+            <button class="toggle-btn" @click="toggleDetail(order.orderNo)">
+              {{ expandedOrder === order.orderNo ? '收起详情 ▲' : '查看详情 ▼' }}
+            </button>
+          </div>
         </div>
 
         <div class="order-detail" v-show="expandedOrder === order.orderNo">
@@ -123,6 +131,30 @@ const formatTime = (timeArray: number[] | string) => {
   return '时间格式解析异常'
 }
 
+// 模拟付款
+const handlePay = async (id: number) => {
+  if (!confirm('付款：将扣除您的余额，确认支付吗？')) return
+  try {
+    await orderApi.payOrder(id)
+    alert('支付成功！等待管理员发货。')
+    loadOrders() // 刷新列表
+  } catch (error: any) {
+    alert(error.response?.data?.message || '支付失败')
+  }
+}
+
+// 确认收货
+const handleReceive = async (id: number) => {
+  if (!confirm('确认您已收到商品且完好无损吗？')) return
+  try {
+    await orderApi.receiveOrder(id)
+    alert('交易完成！感谢您的购买。')
+    loadOrders() // 刷新列表
+  } catch (error: any) {
+    alert(error.response?.data?.message || '确认失败')
+  }
+}
+
 onMounted(() => {
   loadOrders()
 })
@@ -159,4 +191,9 @@ h4 { margin-top: 0; color: #333; margin-bottom: 15px; }
 .item-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .item-table th, .item-table td { padding: 10px; text-align: left; border-bottom: 1px solid #f0f0f0; }
 .item-table .subtotal { font-weight: bold; color: #333; }
+
+.action-group { display: flex; gap: 10px; align-items: center; }
+.action-btn { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; }
+.pay-btn { background-color: #28a745; }
+.receive-btn { background-color: #17a2b8; }
 </style>

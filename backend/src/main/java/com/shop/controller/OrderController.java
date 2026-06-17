@@ -157,4 +157,91 @@ public class OrderController {
         return Response.status(Response.Status.UNAUTHORIZED)
                 .entity(new ApiResponse<>(401, "请先登录", null)).build();
     }
+
+    /**
+     * 模拟用户付款 (状态 1 -> 2)
+     * PUT /api/orders/{id}/pay
+     */
+    @PUT
+    @Path("/{id}/pay")
+    public Response payOrder(@HeaderParam("user-id") Long userId, @PathParam("id") Long id) {
+        if (userId == null) return unauthorized();
+
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            OrderService orderService = new OrderService(em);
+            // 这里为了简便，我们不把它塞进 Service，直接用 Dao 查
+            com.shop.dao.OrderDao orderDao = new com.shop.dao.OrderDao(em);
+            Order order = orderDao.findById(id);
+
+            if (order == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(new ApiResponse<>(404, "订单不存在", null)).build();
+            }
+
+            // 越权防线：只能操作自己的订单
+            if (!order.getUser().getId().equals(userId)) {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .entity(new ApiResponse<>(403, "越权操作：这不是您的订单", null)).build();
+            }
+
+            // 状态机防线：只有"待付款(1)"状态才能执行付款操作
+            if (order.getStatus() != 1) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ApiResponse<>(400, "当前订单状态无法执行付款操作", null)).build();
+            }
+
+            order.setStatus(2); // 变更为：已付款待发货
+
+            em.getTransaction().begin();
+            em.merge(order);
+            em.getTransaction().commit();
+
+            return Response.ok(new ApiResponse<>(200, "付款成功！", null)).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponse<>(500, "操作失败", null)).build();
+        } finally {
+            em.close();
+        }
+    }
+
+    /**
+     * 用户确认收货 (状态 3 -> 4)
+     * PUT /api/orders/{id}/receive
+     */
+    @PUT
+    @Path("/{id}/receive")
+    public Response receiveOrder(@HeaderParam("user-id") Long userId, @PathParam("id") Long id) {
+        if (userId == null) return unauthorized();
+
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            com.shop.dao.OrderDao orderDao = new com.shop.dao.OrderDao(em);
+            Order order = orderDao.findById(id);
+
+            if (order == null) return Response.status(Response.Status.NOT_FOUND)
+                    .entity(new ApiResponse<>(404, "订单不存在", null)).build();
+
+            if (!order.getUser().getId().equals(userId)) return Response.status(Response.Status.FORBIDDEN)
+                    .entity(new ApiResponse<>(403, "越权操作", null)).build();
+
+            // 状态机防线：只有"已发货(3)"状态才能确认收货
+            if (order.getStatus() != 3) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ApiResponse<>(400, "订单尚未发货，无法确认收货", null)).build();
+            }
+
+            order.setStatus(4); // 变更为：已完成
+
+            em.getTransaction().begin();
+            em.merge(order);
+            em.getTransaction().commit();
+
+            return Response.ok(new ApiResponse<>(200, "确认收货成功，订单已完成！", null)).build();
+        } finally {
+            em.close();
+        }
+    }
 }

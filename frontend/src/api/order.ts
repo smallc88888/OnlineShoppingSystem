@@ -37,5 +37,14 @@ export const orderApi = {
     // 获取历史订单列表
     getOrders() {
         return apiClient.get('/orders')
+    },
+
+    payOrder(id: number) {
+        return apiClient.put(`/orders/${id}/pay`)
+    },
+
+    // 确认收货
+    receiveOrder(id: number) {
+        return apiClient.put(`/orders/${id}/receive`)
     }
 }

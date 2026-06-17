@@ -8,6 +8,8 @@ const Cart = () => import('../views/Cart.vue')
 const Checkout = () => import('../views/Checkout.vue')
 const OrderSuccess = () => import('../views/OrderSuccess.vue')
 const OrderList = () => import('../views/OrderList.vue')
+const AdminProducts = () => import('../views/AdminProducts.vue')
+const AdminOrders = () => import('../views/AdminOrders.vue')
 
 const router = createRouter({
     history: createWebHistory(),
@@ -20,7 +22,9 @@ const router = createRouter({
         { path: '/cart', component: Cart },
         { path: '/checkout', component: Checkout },
         { path: '/order-success', component: OrderSuccess },
-        { path: '/orders', component: OrderList }
+        { path: '/orders', component: OrderList },
+        { path: '/admin/products', component: AdminProducts },
+        { path: '/admin/orders', component: AdminOrders }
     ]
 })
 

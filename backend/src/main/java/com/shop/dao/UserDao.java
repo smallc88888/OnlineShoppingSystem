@@ -9,7 +9,7 @@ public class UserDao {
 
     private final EntityManager em;
 
-    // 💡 课程重点：通过构造函数传入 EntityManager，这被称为“依赖注入 (DI)”。
+    // 通过构造函数传入 EntityManager，这被称为“依赖注入 (DI)”。
     // 以后写单元测试时，我们可以直接塞一个连着 H2 内存数据库的 EntityManager 进去，
     // 或者塞一个 Mockito 伪造的对象，完全不需要启动 MySQL！
     public UserDao(EntityManager em) {
@@ -67,5 +67,12 @@ public class UserDao {
         } catch (NoResultException e) {
             return null; // 查不到说明用户名未被注册，返回 null 给业务层判断
         }
+    }
+
+    /**
+     * 根据主键ID查找用户
+     */
+    public User findById(Long id) {
+        return em.find(User.class, id);
     }
 }

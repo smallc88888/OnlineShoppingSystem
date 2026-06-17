@@ -29,4 +29,22 @@ public class OrderDao {
     public Order findById(Long orderId) {
         return em.find(Order.class, orderId);
     }
+
+    /**
+     * 获取全站所有历史订单（后台管理员使用）
+     */
+    public List<Order> findAllOrders() {
+        // 同样使用 FETCH 抓取明细，防止 N+1 性能雪崩
+        String jpql = "SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.items ORDER BY o.createdAt DESC";
+        return em.createQuery(jpql, Order.class).getResultList();
+    }
+
+    /**
+     * 更新订单状态
+     */
+    public void update(Order order) {
+        em.getTransaction().begin();
+        em.merge(order);
+        em.getTransaction().commit();
+    }
 }

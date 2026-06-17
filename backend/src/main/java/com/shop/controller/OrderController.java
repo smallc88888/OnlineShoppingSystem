@@ -57,6 +57,7 @@ public class OrderController {
         public int status;
         public LocalDateTime createdAt;
         public List<OrderItemResponseDTO> items;
+        public Long id;
 
         public OrderResponseDTO(Order order) {
             this.orderNo = order.getOrderNo();
@@ -66,6 +67,7 @@ public class OrderController {
             this.receiverAddress = order.getReceiverAddress();
             this.status = order.getStatus();
             this.createdAt = order.getCreatedAt();
+            this.id = order.getId();
             // 组装并映射挂载的明细列表
             this.items = order.getItems().stream()
                     .map(OrderItemResponseDTO::new)

@@ -80,4 +80,31 @@ public class ProductDao {
         // 使用 JPA 原生的 find 方法，通过主键直接去缓存或数据库抓取，性能极高
         return em.find(Product.class, id);
     }
+
+    /**
+     * 新增商品
+     */
+    public void save(Product product) {
+        em.getTransaction().begin();
+        em.persist(product);
+        em.getTransaction().commit();
+    }
+
+    /**
+     * 更新商品信息
+     */
+    public void update(Product product) {
+        em.getTransaction().begin();
+        em.merge(product);
+        em.getTransaction().commit();
+    }
+
+    /**
+     * 获取全站所有商品（包含已下架，仅供后台管理员使用）
+     */
+    public List<Product> findAllForAdmin() {
+        // 按创建时间倒序或主键倒序，把最新的排在前面
+        String jpql = "SELECT p FROM Product p ORDER BY p.id DESC";
+        return em.createQuery(jpql, Product.class).getResultList();
+    }
 }

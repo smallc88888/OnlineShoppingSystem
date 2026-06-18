@@ -9,8 +9,6 @@
 
         <class>com.shop.entity.User</class>
         <class>com.shop.entity.Product</class>
-        <class>com.shop.entity.User</class>
-        <class>com.shop.entity.Product</class>
         <class>com.shop.entity.CartItem</class>
         <class>com.shop.entity.Order</class>
         <class>com.shop.entity.OrderItem</class>

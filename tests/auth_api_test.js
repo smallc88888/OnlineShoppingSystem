@@ -6,7 +6,7 @@ const BASE_URL = 'http://localhost:8080/api/users';
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: 'Hrz214117+', // 记得替换为真实的密码
+    password: '********', // 记得替换为真实的密码
     database: 'shopping_system'
 };
 

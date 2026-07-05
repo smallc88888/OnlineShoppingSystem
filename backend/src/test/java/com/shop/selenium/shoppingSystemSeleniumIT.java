@@ -20,10 +20,8 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-/*import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;*/
-import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -45,8 +43,7 @@ import java.util.Locale;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ShoppingSystemSeleniumIT {
 
-    /*private static final String BASE_URL = System.getProperty("selenium.baseUrl", "http://127.0.0.1:5173");*/
-    private static final String BASE_URL = System.getProperty("selenium.baseUrl", "http://localhost:5173");
+    private static final String BASE_URL = System.getProperty("selenium.baseUrl", "http://127.0.0.1:5173");
     private static final String DB_URL = System.getProperty(
             "selenium.dbUrl",
             "jdbc:mysql://127.0.0.1:3306/shopping_system?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai"
@@ -76,7 +73,7 @@ class ShoppingSystemSeleniumIT {
         Files.createDirectories(EVIDENCE_DIR);
     }
 
-    /*@BeforeEach
+    @BeforeEach
     void setUp() throws SQLException {
         resetDatabase();
 
@@ -91,26 +88,6 @@ class ShoppingSystemSeleniumIT {
         );
 
         driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    }*/
-
-    @BeforeEach
-    void setUp() throws SQLException {
-        resetDatabase();
-
-        System.setProperty("webdriver.edge.driver", "D:/ProgrammingWork/msedgedriver/msedgedriver.exe");
-
-        EdgeOptions options = new EdgeOptions();
-        if (Boolean.parseBoolean(System.getProperty("selenium.headless", "true"))) {
-            options.addArguments("--headless=new"); // 依然支持无头模式
-        }
-        options.addArguments(
-                "--window-size=1440,1000",
-                "--disable-search-engine-choice-screen",
-                "--no-default-browser-check"
-        );
-
-        driver = new EdgeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
@@ -145,7 +122,7 @@ class ShoppingSystemSeleniumIT {
 
         Assertions.assertEquals("3", driver.findElement(By.cssSelector("input.qty-input")).getAttribute("value"));
         Assertions.assertEquals("1", queryString(
-                "SELECT COUNT(*) FROM cart_items WHERE user_id=11 AND product_id=1"
+                "SELECT COUNT(*) FROM cart_items WHERE user_id=2 AND product_id=1"
         ));
     }
 
@@ -175,8 +152,8 @@ class ShoppingSystemSeleniumIT {
     @Order(5)
     @DisplayName("CART-10-购物车总金额计算")
     void cartTotalAmount() {
-        seedCart(1, 2, 11);
-        seedCart(2, 1, 11);
+        seedCart(1, 2, 2);
+        seedCart(2, 1, 2);
         login("user", "Password123!");
         openCartWithItems();
 
@@ -187,7 +164,7 @@ class ShoppingSystemSeleniumIT {
     @Order(6)
     @DisplayName("CART-11-正常修改数量")
     void updateCartQuantity() {
-        seedCart(1, 2, 11);
+        seedCart(1, 2, 2);
         login("user", "Password123!");
         openCartWithItems();
 
@@ -196,7 +173,7 @@ class ShoppingSystemSeleniumIT {
         wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector(".subtotal"), "135.00"));
 
         Assertions.assertEquals("3", queryString(
-                "SELECT quantity FROM cart_items WHERE user_id=11 AND product_id=1"
+                "SELECT quantity FROM cart_items WHERE user_id=2 AND product_id=1"
         ));
     }
 
@@ -204,7 +181,7 @@ class ShoppingSystemSeleniumIT {
     @Order(7)
     @DisplayName("CART-12-修改数量下边界1")
     void updateCartLowerBoundary() {
-        seedCart(1, 2, 11);
+        seedCart(1, 2, 2);
         login("user", "Password123!");
         openCartWithItems();
 
@@ -213,7 +190,7 @@ class ShoppingSystemSeleniumIT {
         wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector(".subtotal"), "45.00"));
 
         Assertions.assertEquals("1", queryString(
-                "SELECT quantity FROM cart_items WHERE user_id=11 AND product_id=1"
+                "SELECT quantity FROM cart_items WHERE user_id=2 AND product_id=1"
         ));
     }
 
@@ -221,15 +198,15 @@ class ShoppingSystemSeleniumIT {
     @Order(8)
     @DisplayName("ORDER-03-正常提交订单")
     void normalCheckout() {
-        seedCart(1, 2, 11);
+        seedCart(1, 2, 2);
         login("user", "Password123!");
         submitCheckout("张三", "13812345678", "浙江省杭州市西湖区文一路100号");
 
         Assertions.assertTrue(driver.getPageSource().contains("订单提交成功"));
         Assertions.assertEquals("0", queryString(
-                "SELECT status FROM orders WHERE user_id=11 ORDER BY id DESC LIMIT 1"
+                "SELECT status FROM orders WHERE user_id=2 ORDER BY id DESC LIMIT 1"
         ));
-        Assertions.assertEquals("0", queryString("SELECT COUNT(*) FROM cart_items WHERE user_id=11"));
+        Assertions.assertEquals("0", queryString("SELECT COUNT(*) FROM cart_items WHERE user_id=2"));
         Assertions.assertEquals("98", queryString("SELECT stock FROM products WHERE id=1"));
     }
 
@@ -238,13 +215,13 @@ class ShoppingSystemSeleniumIT {
     @DisplayName("ORDER-05-姓名长度2和20边界")
     void receiverNameBoundaries() {
         login("user", "Password123!");
-        seedCart(1, 1, 11);
+        seedCart(1, 1, 2);
         submitCheckout("张三", "13812345678", "浙江省杭州市西湖区文一路100号");
 
-        seedCart(1, 1, 11);
+        seedCart(1, 1, 2);
         submitCheckout("ABCDEFGHIJKLMNOPQRST", "13812345678", "浙江省杭州市西湖区文一路100号");
 
-        Assertions.assertEquals("2", queryString("SELECT COUNT(*) FROM orders WHERE user_id=11"));
+        Assertions.assertEquals("2", queryString("SELECT COUNT(*) FROM orders WHERE user_id=2"));
     }
 
     @Test
@@ -252,20 +229,20 @@ class ShoppingSystemSeleniumIT {
     @DisplayName("ORDER-08-地址长度10和100边界")
     void receiverAddressBoundaries() {
         login("user", "Password123!");
-        seedCart(1, 1, 11);
+        seedCart(1, 1, 2);
         submitCheckout("张三", "13812345678", "浙江省杭州市西湖区A");
 
-        seedCart(1, 1, 11);
+        seedCart(1, 1, 2);
         submitCheckout("张三", "13812345678", "A".repeat(100));
 
-        Assertions.assertEquals("2", queryString("SELECT COUNT(*) FROM orders WHERE user_id=11"));
+        Assertions.assertEquals("2", queryString("SELECT COUNT(*) FROM orders WHERE user_id=2"));
     }
 
     @Test
     @Order(11)
     @DisplayName("ORDER-10-防止重复提交")
     void preventDuplicateCheckout() {
-        seedCart(1, 1, 11);
+        seedCart(1, 1, 2);
         login("user", "Password123!");
         driver.get(BASE_URL + "/checkout");
 
@@ -279,14 +256,14 @@ class ShoppingSystemSeleniumIT {
         new Actions(driver).doubleClick(submit).perform();
         wait.until(ExpectedConditions.urlContains("/order-success"));
 
-        Assertions.assertEquals("1", queryString("SELECT COUNT(*) FROM orders WHERE user_id=11"));
+        Assertions.assertEquals("1", queryString("SELECT COUNT(*) FROM orders WHERE user_id=2"));
     }
 
     @Test
     @Order(12)
     @DisplayName("ORDER-12-用户订单列表显示")
     void orderListDisplay() {
-        seedOrder("ORDSELENIUM012", 0, 11, new BigDecimal("45.00"));
+        seedOrder("ORDSELENIUM012", 0, 2, new BigDecimal("45.00"));
         login("user", "Password123!");
         driver.get(BASE_URL + "/orders");
 
@@ -301,7 +278,7 @@ class ShoppingSystemSeleniumIT {
     @Order(13)
     @DisplayName("ORDER-14-待付款订单付款")
     void payOrder() {
-        seedOrder("ORDSELENIUM014", 1, 11, new BigDecimal("45.00"));
+        seedOrder("ORDSELENIUM014", 1, 2, new BigDecimal("45.00"));
         login("user", "Password123!");
         driver.get(BASE_URL + "/orders");
 
@@ -321,7 +298,7 @@ class ShoppingSystemSeleniumIT {
     @Order(14)
     @DisplayName("ORDER-16-已发货订单确认收货")
     void receiveOrder() {
-        seedOrder("ORDSELENIUM016", 3, 11, new BigDecimal("45.00"));
+        seedOrder("ORDSELENIUM016", 3, 2, new BigDecimal("45.00"));
         login("user", "Password123!");
         driver.get(BASE_URL + "/orders");
 
@@ -341,7 +318,7 @@ class ShoppingSystemSeleniumIT {
     @Order(15)
     @DisplayName("ORDER-18-用户订单数据隔离")
     void userOrderIsolation() {
-        seedOrder("ORD-USER-ONLY", 0, 11, new BigDecimal("45.00"));
+        seedOrder("ORD-USER-ONLY", 0, 2, new BigDecimal("45.00"));
         seedOrder("ORD-ADMIN-ONLY", 0, 1, new BigDecimal("45.00"));
         login("user", "Password123!");
         driver.get(BASE_URL + "/orders");

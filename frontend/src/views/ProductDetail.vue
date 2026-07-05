@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <button class="back-btn" @click="router.back()">← 返回商品列表</button>
+    <button class="back-btn" @click="router.push('/products')">← 返回商品列表</button>
 
     <div v-if="loading" class="loading">正在加载商品信息...</div>
     <div v-else-if="errorMessage" class="error-msg">{{ errorMessage }}</div>

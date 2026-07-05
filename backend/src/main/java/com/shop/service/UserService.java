@@ -20,6 +20,20 @@ public class UserService {
      * 用户注册逻辑
      */
     public void register(UserRegisterDTO dto) {
+        // 0. 防御性编程：核心字段判空与边界值校验 (修复 TC-REG-04 和 TC-REG-03)
+        if (dto == null) {
+            throw new IllegalArgumentException("请求数据不能为空");
+        }
+        if (dto.getUsername() == null || dto.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("用户名不能为空");
+        }
+        if (dto.getPassword() == null || dto.getConfirmPassword() == null) {
+            throw new IllegalArgumentException("密码不能为空");
+        }
+        if (dto.getUsername().length() > 20) {
+            throw new IllegalArgumentException("用户名长度不能超过20个字符");
+        }
+
         // 1. 检查用户名是否已存在 (业务规则)
         User existingUser = userDao.findByUsername(dto.getUsername());
         if (existingUser != null) {

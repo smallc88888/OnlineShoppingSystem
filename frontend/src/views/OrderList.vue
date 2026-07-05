@@ -124,10 +124,21 @@ const getStatusText = (status: number) => {
 
 // 简单的时间格式化处理
 const formatTime = (timeArray: number[] | string) => {
+  // 兼容后端传来的 LocalDateTime 数组 [year, month, day, hour, minute, second]
+  if (Array.isArray(timeArray)) {
+    // 解构赋值，注意 JS 的 month 必须减 1
+    const [year, month, day, hour = 0, minute = 0, second = 0] = timeArray;
+    const date = new Date(year, month - 1, day, hour, minute, second);
+
+    // 返回字符串格式
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
+  }
+
   // 如果后端发来的是字符串 (因为我们配了 JSR310 模块，应该是 ISO 字符串)
   if (typeof timeArray === 'string') {
     return timeArray.replace('T', ' ').substring(0, 19)
   }
+
   return '时间格式解析异常'
 }
 

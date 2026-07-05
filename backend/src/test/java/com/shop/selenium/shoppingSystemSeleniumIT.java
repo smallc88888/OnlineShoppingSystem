@@ -20,8 +20,10 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+/*import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;*/
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -43,7 +45,7 @@ import java.util.Locale;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ShoppingSystemSeleniumIT {
 
-    private static final String BASE_URL = System.getProperty("selenium.baseUrl", "http://127.0.0.1:5173");
+    private static final String BASE_URL = System.getProperty("selenium.baseUrl", "http://localhost:5173");
     private static final String DB_URL = System.getProperty(
             "selenium.dbUrl",
             "jdbc:mysql://127.0.0.1:3306/shopping_system?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai"
@@ -73,7 +75,7 @@ class ShoppingSystemSeleniumIT {
         Files.createDirectories(EVIDENCE_DIR);
     }
 
-    @BeforeEach
+    /*@BeforeEach
     void setUp() throws SQLException {
         resetDatabase();
 
@@ -88,6 +90,26 @@ class ShoppingSystemSeleniumIT {
         );
 
         driver = new ChromeDriver(options);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    }*/
+
+    @BeforeEach
+    void setUp() throws SQLException {
+        resetDatabase();
+
+        System.setProperty("webdriver.edge.driver", "D:/ProgrammingWork/msedgedriver/msedgedriver.exe");
+
+        EdgeOptions options = new EdgeOptions();
+        if (Boolean.parseBoolean(System.getProperty("selenium.headless", "true"))) {
+            options.addArguments("--headless=new"); // 依然支持无头模式
+        }
+        options.addArguments(
+                "--window-size=1440,1000",
+                "--disable-search-engine-choice-screen",
+                "--no-default-browser-check"
+        );
+
+        driver = new EdgeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 

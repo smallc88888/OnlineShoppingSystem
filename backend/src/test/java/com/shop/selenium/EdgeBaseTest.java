@@ -17,7 +17,7 @@ public class EdgeBaseTest {
 
     @BeforeEach
     public void setUp() {
-        System.setProperty("webdriver.edge.driver", "D:\\Download\\edgedriver_win64\\msedgedriver.exe");
+        System.setProperty("webdriver.edge.driver", "D:/ProgrammingWork/msedgedriver/msedgedriver.exe");
         EdgeOptions options = new EdgeOptions();
         // options.addArguments("--headless"); // 先不加，方便观察
         driver = new EdgeDriver(options);

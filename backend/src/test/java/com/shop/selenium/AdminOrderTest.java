@@ -61,7 +61,7 @@ public class AdminOrderTest extends EdgeBaseTest {
         WebElement firstCard = driver.findElement(By.cssSelector(".order-card"));
         WebElement toggleBtn = firstCard.findElement(By.cssSelector(".toggle-btn"));
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i <= 3; i++) {
             toggleBtn.click();
             // 等待动画完成（简单延时或等待样式变化）
             try { Thread.sleep(300); } catch (InterruptedException ignored) {}
